@@ -37,7 +37,7 @@ dipole_vec = None
 negative_charge_pos = None
 
 if CALC_TYPE == "C":
-    resid_position = molecule.GetChargePosition(RESID)
+    charge_sign, resid_position = molecule.GetChargePosition(RESID)
 if CALC_TYPE == "P":
     resid_position, dipole_vec, negative_charge_pos, _ = molecule.GetDipolePosition(RESID)
 
@@ -83,7 +83,7 @@ if CALC_TYPE == "C":
     angle = np.arccos(u.dot(n1))
 
     idx = molecule.GetAtomIdx(atom1)
-    print(f"{CALC_TYPE} {idx} {distance_best:.5f} {angle:.5f}")
+    print(f"{CALC_TYPE} {charge_sign} {idx} {distance_best:.5f} {angle:.5f}")
 
 if CALC_TYPE == "P":
     n = Normalized(np.cross(x2 - x1, x3 - x1))

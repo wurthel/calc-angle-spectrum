@@ -70,24 +70,31 @@ class Molecule:
 
     def GetChargePosition(self, resid):
         position: np.ndarray
+        charge: str
+
 
         residue = self._Residues[resid]
         resname = residue['C'].ResName
 
         if resname == "ARG":
+            charge = "+"
             position = residue["NH1"].Coordinate
         elif resname == "HIS":
+            charge = "+"
             position = residue["ND1"].Coordinate
         elif resname == "LYS":
+            charge = "+"
             position = residue["NZ"].Coordinate
-        elif resname == "ASP" or resname == "ASH":
+        elif resname == "ASP":
+            charge = "-"
             position = 0.5 * (residue["OD1"].Coordinate + residue["OD2"].Coordinate)
-        elif resname == "GLU" or resname == "GLH":
+        elif resname == "GLU":
+            charge = "-"
             position = 0.5 * (residue["OE1"].Coordinate + residue["OE2"].Coordinate)
         else:
             assert False, f"{resname} not charged"
 
-        return position
+        return charge, position
 
     def GetDipolePosition(self, resid):
         positive_charge: str
