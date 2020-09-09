@@ -9,5 +9,11 @@ def GetPrevAndNext(x, array):
     return prev, next
 
 
+def NormalToPlane(x1, x2, x3):
+    v1 = x2 - x1
+    v2 = x3 - x1
+    return np.cross(v1, v2)
+
+
 def Normalized(v: np.ndarray):
     return v / np.linalg.norm(v)

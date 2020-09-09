@@ -1,10 +1,28 @@
 import numpy as np
-from Utils import GetPrevAndNext, Normalized
-from Molecule import Molecule
+import argparse
+from function import function_shift, function_shift_dipoles
+from utils import GetPrevAndNext, Normalized
+from molecule import Molecule
 
-PDB_FILENAME = "1M0L.pdb"  # имя PDB-структуры
-RESID = 200  # номер аминокислоты в PDB, указываемый пользователем
-CHROMOPHORE_RESID = 212  # номер хромофора в PDB
+approximated_negative_charge_shift = function_shift("Neggrid.txt")
+approximated_positive_charge_shift = function_shift("Posgrid.txt")
+approximated_dipole_shift = function_shift_dipoles()
+
+parser = argparse.ArgumentParser(description=" This program calculate max lambda for chrompohore ")
+parser.add_argument("-pdbfilename", default="1M0L.pdb",
+                    type=str,
+                    help="Name of file in format: X.pdb")
+parser.add_argument("-resid", default=210,
+                    type=int,
+                    help="Aminoacide id in pbd file")
+parser.add_argument("-chrid", default=212,
+                    type=int,
+                    help="Chromophore id in pdb")
+args = parser.parse_args()
+
+PDB_FILENAME = args.pdbfilename  # имя PDB-структуры
+RESID = args.resid  # номер аминокислоты в PDB, указываемый пользователем
+CHROMOPHORE_RESID = args.chrid  # номер хромофора в PDB
 
 # CHROMOPHORE
 CHROMOPHORE_CONSID_ATOMS = ["C4", "C5", "C6", "C7", "C8", "C9", "C10", "C11", "C12", "C13", "C14", "C15", "NZ"]
@@ -35,13 +53,16 @@ CALC_TYPE = molecule.GetAminoacidType(RESID)
 resid_position = None
 dipole_vec = None
 negative_charge_pos = None
+charge_sign = ''
 
 if CALC_TYPE == "C":
     charge_sign, resid_position = molecule.GetChargePosition(RESID)
 if CALC_TYPE == "P":
     resid_position, dipole_vec, negative_charge_pos, _ = molecule.GetDipolePosition(RESID)
 
+chrNearestAtom = None
 atom_best, v_best, distance_best = None, None, None
+
 for atom_name in CHROMOPHORE_CONSID_ATOMS:
     atom = molecule.GetAtomByRes(CHROMOPHORE_RESID, atom_name)
     v = resid_position - atom.Coordinate
@@ -49,7 +70,17 @@ for atom_name in CHROMOPHORE_CONSID_ATOMS:
     if distance_best is None or distance < distance_best:
         v_best = np.array(v)
         atom_best = atom
+        chrNearestAtom = atom_name
         distance_best = distance
+
+if chrNearestAtom is None:
+    print("Cannot define atom in Chromophore")
+    exit()
+else:
+    if chrNearestAtom == "NZ":
+        chrNearestAtom = 16
+    else:
+        chrNearestAtom = int(chrNearestAtom.replace("C", ""))
 
 v = v_best
 atom1 = atom_best
@@ -84,6 +115,11 @@ if CALC_TYPE == "C":
 
     idx = molecule.GetAtomIdx(atom1)
     print(f"{CALC_TYPE} {charge_sign} {idx} {distance_best:.5f} {angle:.5f}")
+    if charge_sign == "+":
+        lambda_max_val = approximated_dipole_shift
+    else:
+        lambda_max_val = approximated_negative_charge_shift(chrNearestAtom, distance_best, angle)
+    print(f"lambda max {lambda_max_val:.6f}")
 
 if CALC_TYPE == "P":
     n = Normalized(np.cross(x2 - x1, x3 - x1))
@@ -97,4 +133,7 @@ if CALC_TYPE == "P":
     orientation = "L" if np.dot(dipole_vec, vec_to_ring) > 0 else "R"
 
     idx = molecule.GetAtomIdx(atom1)
+    lambda_max_val = approximated_dipole_shift(chrNearestAtom, distance_best, angle, orientation)
+
     print(f"{CALC_TYPE} {idx} {orientation} {distance_best:.5f} {angle:.5f}")
+    print(f"lambda max {lambda_max_val:.6f}")

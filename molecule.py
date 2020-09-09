@@ -1,5 +1,5 @@
 import numpy as np
-from Atom import Atom
+from atom import Atom
 
 
 class Molecule:
@@ -71,7 +71,6 @@ class Molecule:
     def GetChargePosition(self, resid):
         position: np.ndarray
         charge: str
-
 
         residue = self._Residues[resid]
         resname = residue['C'].ResName
