@@ -89,7 +89,7 @@ def function_shift_dipoles():
 
     def shell_function(X_shift, Y_shift, cos_alpha, dist="R"):
         def regression_func(x, a, b):
-            return a * (b / x)
+            return a / x + b
 
         z = []
         alpha = convert_cos_to_degree(cos_alpha, dist)
