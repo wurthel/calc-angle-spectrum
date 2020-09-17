@@ -14,7 +14,7 @@ parser.add_argument("-pdbfilename", default="1M0L.pdb",
                     help="Name of file in format: X.pdb")
 parser.add_argument("-resid", default=210,
                     type=int,
-                    help="Aminoacide id in pbd file")
+                    help="Aminoacide id in pdb file")
 parser.add_argument("-chrid", default=212,
                     type=int,
                     help="Chromophore id in pdb")
@@ -57,8 +57,11 @@ charge_sign = ''
 
 if CALC_TYPE == "C":
     charge_sign, resid_position = molecule.GetChargePosition(RESID)
-if CALC_TYPE == "P":
+elif CALC_TYPE == "P":
     resid_position, dipole_vec, negative_charge_pos, _ = molecule.GetDipolePosition(RESID)
+elif CALC_TYPE == "O":
+    print("lambda max 0 nm, neutral non-polar residue")
+    exit()
 
 chrNearestAtom = None
 atom_best, v_best, distance_best = None, None, None
@@ -74,7 +77,7 @@ for atom_name in CHROMOPHORE_CONSID_ATOMS:
         distance_best = distance
 
 if chrNearestAtom is None:
-    print("Cannot define atom in Chromophore")
+    print("Cannot define atom in chromophore")
     exit()
 else:
     if chrNearestAtom == "NZ":
@@ -119,7 +122,7 @@ if CALC_TYPE == "C":
         lambda_max_val = approximated_dipole_shift
     else:
         lambda_max_val = approximated_negative_charge_shift(chrNearestAtom, distance_best, angle)
-    print(f"lambda max {lambda_max_val:.6f}")
+    print(f"lambda max {lambda_max_val:.6f} nm")
 
 if CALC_TYPE == "P":
     n = Normalized(np.cross(x2 - x1, x3 - x1))
@@ -136,4 +139,4 @@ if CALC_TYPE == "P":
     lambda_max_val = approximated_dipole_shift(chrNearestAtom, distance_best, angle, orientation)
 
     print(f"{CALC_TYPE} {idx} {orientation} {distance_best:.5f} {angle:.5f}")
-    print(f"lambda max {lambda_max_val:.6f}")
+    print(f"lambda max {lambda_max_val:.6f} nm")
