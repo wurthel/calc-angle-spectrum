@@ -88,8 +88,8 @@ def function_shift_dipoles():
     approximate_dip3 = interpolate.Rbf(*list_pos_xy.T, list_values3, function='cubic')
 
     def shell_function(X_shift, Y_shift, cos_alpha, dist="R"):
-        def regression_func(x, a, b, c):
-            return a * (b / x) + c
+        def regression_func(x, a, b):
+            return a * (b / x)
 
         z = []
         alpha = convert_cos_to_degree(cos_alpha, dist)
