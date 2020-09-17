@@ -103,7 +103,7 @@ class Molecule:
         resname = residue['C'].ResName
 
         if resname == "SER":
-            positive_charge = "HG"
+            positive_charge = "HG1"
             negative_charge = "OG"
         elif resname == "THR":
             positive_charge = "HG1"
