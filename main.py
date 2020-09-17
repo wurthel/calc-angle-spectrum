@@ -119,7 +119,7 @@ if CALC_TYPE == "C":
     idx = molecule.GetAtomIdx(atom1)
     print(f"{CALC_TYPE} {charge_sign} {idx} {distance_best:.5f} {angle:.5f}")
     if charge_sign == "+":
-        lambda_max_val = approximated_dipole_shift
+        lambda_max_val = approximated_positive_charge_shift(chrNearestAtom, distance_best, angle)
     else:
         lambda_max_val = approximated_negative_charge_shift(chrNearestAtom, distance_best, angle)
     print(f"lambda max {lambda_max_val:.6f} nm")
